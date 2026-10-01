@@ -5,7 +5,7 @@ using SupportTicketSystem.Domain.Exceptions;
 
 public class Ticket
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
     public string TicketNumber { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;

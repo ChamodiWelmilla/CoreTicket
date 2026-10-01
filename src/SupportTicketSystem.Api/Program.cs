@@ -20,6 +20,7 @@ builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 builder.Services.AddScoped<SlaCalculatorService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<TicketService>();
+builder.Services.AddScoped<DashboardService>();
 
 builder.Services.AddHostedService<SlaBreachNotifierBackgroundService>();
 
@@ -36,6 +37,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers();
 

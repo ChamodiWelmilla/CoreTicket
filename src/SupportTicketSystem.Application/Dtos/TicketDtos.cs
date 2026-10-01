@@ -18,7 +18,8 @@ public record TicketDto(
     DateTime TargetResolutionTime,
     DateTime CreatedAt,
     string CreatedByEmail,
-    string? AssignedAgentEmail
+    string? AssignedAgentEmail,
+    string? LatestNote
 );
 
 public record CommentDto(

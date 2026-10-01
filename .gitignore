@@ -1,6 +1,8 @@
 bin/
 obj/
-*.d*.db-shm
+publish/
+*.db
+*.db-shm
 *.db-wal
 
 .vs/
@@ -16,4 +18,4 @@ obj/
 
 .DS_Store
 Thumbs.db
-ea/
+

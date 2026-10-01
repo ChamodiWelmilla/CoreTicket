@@ -4,7 +4,7 @@ using SupportTicketSystem.Domain.Enums;
 
 public class TicketHistory
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public Guid Id { get; set; }
     public Guid TicketId { get; set; }
     public TicketStatus OldStatus { get; set; }
     public TicketStatus NewStatus { get; set; }

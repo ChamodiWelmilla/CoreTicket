@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreTicket - Developer & Customer Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #fffbeb;
+            --brand-yellow: #f59e0b;
+            --brand-orange: #ea580c;
+            --brand-amber-dark: #b45309;
+            --dark-bg: #0f172a;
+        }
+
+        body {
+            background-color: #fafaf9;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #1c1917;
+            font-size: 0.85rem;
+        }
+
+        .navbar-custom {
+            background: #0f172a;
+            border-bottom: 2px solid #f59e0b;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .brand-badge {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.35);
+        }
+
+        .role-switch {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 2px;
+        }
+
+        .role-switch .btn {
+            border: none;
+            color: #94a3b8;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .role-switch .btn.active {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            box-shadow: 0 2px 6px rgba(234, 88, 12, 0.3);
+        }
+
+        .kpi-card {
+            border: 1px solid #fed7aa;
+            border-radius: 12px;
+            background: #ffffff;
+            padding: 14px 16px;
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(245, 158, 11, 0.05);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.12);
+            border-color: #f59e0b;
+        }
+
+        .kpi-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+        }
+
+        .kpi-icon-amber { background: #fef3c7; color: #d97706; }
+        .kpi-icon-orange { background: #ffedd5; color: #ea580c; }
+        .kpi-icon-danger { background: #fee2e2; color: #dc2626; }
+        .kpi-icon-success { background: #d1fae5; color: #059669; }
+
+        .kpi-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #78350f;
+        }
+
+        .kpi-value {
+            font-size: 1.45rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+
+        .badge-priority-1 { background-color: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .badge-priority-2 { background-color: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+        .badge-priority-3 { background-color: #fff7ed; color: #ea580c; border: 1px solid #fed7aa; }
+        .badge-priority-4 { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .badge-status-1 { background-color: #f1f5f9; color: #475569; }
+        .badge-status-2 { background-color: #fef3c7; color: #d97706; }
+        .badge-status-4 { background-color: #dcfce7; color: #16a34a; }
+        .badge-status-5 { background-color: #f3f4f6; color: #6b7280; }
+
+        .table-compact td, .table-compact th {
+            padding: 9px 12px;
+            vertical-align: middle;
+        }
+
+        .btn-action-amber {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+        }
+
+        .btn-action-amber:hover {
+            background: linear-gradient(135deg, #d97706, #c2410c);
+            color: white;
+        }
+
+        .toast-notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark navbar-custom shadow-sm px-3 mb-3">
+        <div class="container-fluid px-1">
+            <div class="d-flex align-items-center">
+                <div class="brand-badge me-2">
+                    <i class="bi bi-ticket-detailed-fill fs-5"></i>
+                </div>
+                <div>
+                    <span class="navbar-brand fw-bold text-white fs-6 mb-0 p-0">CoreTicket</span>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <div id="authNavContainer">
+                    <button class="btn btn-outline-warning btn-sm fw-semibold ms-2" style="font-size:0.75rem;" onclick="openAuthModal('login')">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-3">
+
+        <div id="guestWelcomeView" class="py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6 col-lg-5 text-center">
+                    <div class="card border-0 shadow-lg rounded-4 p-4" style="background:#ffffff; border-top: 4px solid #f59e0b;">
+                        <div class="brand-badge d-inline-flex mx-auto mb-3" style="padding: 12px 16px; border-radius: 12px;">
+                            <i class="bi bi-ticket-detailed-fill fs-2"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Welcome to CoreTicket</h4>
+                        <p class="text-muted small mb-4">Please sign in or create an account to access your Customer Submission Portal or Developer SLA Dashboard.</p>
+                        
+                        <div class="d-grid gap-2 col-10 mx-auto">
+                            <button class="btn btn-action-amber py-2 fw-semibold" onclick="openAuthModal('login')">
+                                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In to Portal
+                            </button>
+                            <button class="btn btn-outline-warning text-dark py-2 fw-semibold border-2" onclick="openAuthModal('register')">
+                                <i class="bi bi-person-plus-fill me-2"></i>Create New Account
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="customerView" style="display:none;">
+            <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                    <div class="card border-0 shadow-sm rounded-3 p-3">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-pencil-square text-warning me-2"></i>Submit Issue or Suggestion</h6>
+                            <span class="badge bg-amber-100 text-amber-800" style="background:#fef3c7; color:#92400e; font-size:0.7rem;">Direct Developer Queue</span>
+                        </div>
+                        <form id="customerTicketForm">
+                            <div class="mb-2">
+                                <label class="form-label fw-semibold small mb-1">Issue Category</label>
+                                <select id="custCategory" class="form-select form-select-sm">
+                                    <option value="Bug">🐞 Bug / Technical Issue</option>
+                                    <option value="Idea">💡 Feature Idea</option>
+                                    <option value="Suggestion">💬 Improvement Suggestion</option>
+                                    <option value="General">❓ General Query</option>
+                                </select>
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label fw-semibold small mb-1">Summary Title</label>
+                                <input type="text" id="custTitle" class="form-control form-control-sm" placeholder="e.g. Login button times out on mobile" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold small mb-1">Detailed Explanation</label>
+                                <textarea id="custDescription" class="form-control form-control-sm" rows="4" placeholder="Provide details to help developers resolve your issue..." required></textarea>
+                            </div>
+                            <button type="button" class="btn btn-action-amber w-100" onclick="submitCustomerTicket()">
+                                <i class="bi bi-send-fill me-1"></i>Send Ticket to Developers
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="col-md-5">
+                    <div class="card border-0 shadow-sm rounded-3 p-3 h-100">
+                        <h6 class="fw-bold mb-2 text-dark"><i class="bi bi-bell-fill text-warning me-2"></i>My Submissions & Live Status</h6>
+                        <p class="text-muted small mb-2">You will receive instant notifications here when developers resolve your tickets.</p>
+                        <div id="customerTicketsList" class="overflow-auto" style="max-height:320px;">
+                            <div class="text-center py-4 text-muted">No tickets submitted yet.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="developerView" style="display:none;">
+
+            <div class="row g-2 mb-3">
+                <div class="col-xl-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="kpi-label">Total Tickets</div>
+                                <div class="kpi-value text-dark" id="metricTotal">0</div>
+                            </div>
+                            <div class="kpi-icon kpi-icon-amber">
+                                <i class="bi bi-ticket-perforated"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="kpi-label">Active Queue</div>
+                                <div class="kpi-value text-warning" style="color:#d97706;" id="metricOpen">0</div>
+                            </div>
+                            <div class="kpi-icon kpi-icon-orange">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="kpi-label">SLA Breached</div>
+                                <div class="kpi-value text-danger" id="metricBreached">0</div>
+                            </div>
+                            <div class="kpi-icon kpi-icon-danger">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xl-3 col-sm-6">
+                    <div class="kpi-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="kpi-label">Avg Resolution</div>
+                                <div class="kpi-value text-success" style="color:#059669;" id="metricAvgTime">0h</div>
+                            </div>
+                            <div class="kpi-icon kpi-icon-success">
+                                <i class="bi bi-lightning-charge"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white py-2 px-3 d-flex justify-content-between align-items-center border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold fs-6 me-2">Developer Queue</span>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm active py-0 px-2" style="font-size:0.75rem;" onclick="filterQueue('all', this)">All</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:0.75rem;" onclick="filterQueue('open', this)">Active</button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm py-0 px-2" style="font-size:0.75rem;" onclick="filterQueue('breached', this)">SLA Breached</button>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <div class="input-group input-group-sm" style="width: 220px;">
+                            <span class="input-group-text bg-white border-end-0 py-0"><i class="bi bi-search text-muted small"></i></span>
+                            <input type="text" id="searchInput" class="form-control border-start-0 shadow-none py-1" style="font-size:0.8rem;" placeholder="Search ticket..." onkeyup="searchTickets()">
+                        </div>
+                        <button class="btn btn-light btn-sm border py-0 px-2" onclick="loadDashboard()">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-compact table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr class="text-muted text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.05em;">
+                                <th>Ticket ID</th>
+                                <th>Title & Details</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>SLA Target</th>
+                                <th>SLA Health</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketTableBody">
+                            <tr><td colspan="7" class="text-center py-4 text-muted"><div class="spinner-border spinner-border-sm text-warning me-2"></div>Loading queue...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="modal fade" id="statusModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-sm" style="max-width:340px;">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0 px-3 pt-3">
+                    <h6 class="modal-title fw-bold">Update Status (Developer)</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-3">
+                    <input type="hidden" id="statusTicketId">
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold small mb-1">New Status</label>
+                        <select id="newStatusSelect" class="form-select form-select-sm">
+                            <option value="1">Open</option>
+                            <option value="2">In Progress</option>
+                            <option value="4">Resolved (Notify Customer)</option>
+                            <option value="5">Closed</option>
+                        </select>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label fw-semibold small mb-1">Developer Resolution Note</label>
+                        <input type="text" id="statusNote" class="form-control form-control-sm" placeholder="Fix deployed / idea logged">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-3 pb-3 pt-0">
+                    <button type="button" class="btn btn-action-amber w-100" onclick="saveStatusChange()">Update & Notify Customer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered" style="max-width:380px;">
+            <div class="modal-content border-0 shadow-lg rounded-3">
+                <div class="modal-header border-0 pb-0 px-4 pt-3">
+                    <ul class="nav nav-pills w-100 role-switch p-1" id="authTab" role="tablist">
+                        <li class="nav-item flex-fill text-center" role="presentation">
+                            <button class="nav-link btn w-100 active py-1" id="login-tab" data-bs-toggle="pill" data-bs-target="#loginTabContent" type="button" role="tab">Sign In</button>
+                        </li>
+                        <li class="nav-item flex-fill text-center" role="presentation">
+                            <button class="nav-link btn w-100 py-1" id="register-tab" data-bs-toggle="pill" data-bs-target="#registerTabContent" type="button" role="tab">Create Account</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="tab-content" id="authTabContent">
+                        <div class="tab-pane fade show active" id="loginTabContent" role="tabpanel">
+                            <form onsubmit="event.preventDefault(); handleLogin();">
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small mb-1">Email Address</label>
+                                    <input type="email" id="loginEmail" class="form-control form-control-sm" placeholder="user@domain.com" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small mb-1">Password</label>
+                                    <input type="password" id="loginPassword" class="form-control form-control-sm" placeholder="••••••••" required>
+                                </div>
+                                <button type="submit" class="btn btn-action-amber w-100 py-2 mt-2">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                                </button>
+                            </form>
+                        </div>
+                        <div class="tab-pane fade" id="registerTabContent" role="tabpanel">
+                            <form onsubmit="event.preventDefault(); handleRegister();">
+                                <div class="mb-2">
+                                    <label class="form-label fw-semibold small mb-1">Full Name</label>
+                                    <input type="text" id="regFullName" class="form-control form-control-sm" placeholder="e.g. Alex Rivera" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-semibold small mb-1">Email Address</label>
+                                    <input type="email" id="regEmail" class="form-control form-control-sm" placeholder="alex@domain.com" required>
+                                </div>
+                                <div class="mb-2">
+                                    <label class="form-label fw-semibold small mb-1">Password</label>
+                                    <input type="password" id="regPassword" class="form-control form-control-sm" placeholder="••••••••" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold small mb-1">Account Role</label>
+                                    <select id="regRole" class="form-select form-select-sm">
+                                        <option value="1">Customer / End User</option>
+                                        <option value="2">Developer / Support Agent</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-action-amber w-100 py-2">
+                                    <i class="bi bi-person-plus-fill me-1"></i>Create Account
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const API_URL = '/api';
+        let statusModal;
+        let authModal;
+        let currentUser = null;
+        let rawTicketsList = [];
+        let currentFilter = 'all';
+        let activeRole = 'customer';
+        let previousStatuses = {};
+
+        document.addEventListener('DOMContentLoaded', () => {
+            statusModal = new bootstrap.Modal(document.getElementById('statusModal'));
+            authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            checkStoredAuth();
+            loadDashboard();
+            setInterval(loadDashboard, 5000);
+        });
+
+        function checkStoredAuth() {
+            const userJson = localStorage.getItem('coreticket_user');
+            if (userJson) {
+                try {
+                    currentUser = JSON.parse(userJson);
+                } catch (e) {
+                    localStorage.removeItem('coreticket_user');
+                    currentUser = null;
+                }
+            }
+            applyAuthViewState();
+        }
+
+        function applyAuthViewState() {
+            updateNavAuthUI();
+            const guestView = document.getElementById('guestWelcomeView');
+
+            if (!currentUser) {
+                if (guestView) guestView.style.display = 'block';
+                document.getElementById('customerView').style.display = 'none';
+                document.getElementById('developerView').style.display = 'none';
+            } else {
+                if (guestView) guestView.style.display = 'none';
+                const isDev = currentUser.role === 'Agent' || currentUser.role === '2' || currentUser.role === 'Admin';
+                if (isDev) {
+                    document.getElementById('customerView').style.display = 'none';
+                    document.getElementById('developerView').style.display = 'block';
+                } else {
+                    document.getElementById('customerView').style.display = 'block';
+                    document.getElementById('developerView').style.display = 'none';
+                }
+            }
+        }
+
+        function updateNavAuthUI() {
+            const container = document.getElementById('authNavContainer');
+            if (currentUser) {
+                const isDev = currentUser.role === 'Agent' || currentUser.role === '2' || currentUser.role === 'Admin';
+                container.innerHTML = `
+                    <div class="d-flex align-items-center gap-2 ms-2">
+                        ${isDev ? `<span class="badge px-2 py-1" style="background:#fef3c7; color:#78350f; font-size:0.75rem;"><i class="bi bi-code-square me-1"></i>Developer SLA Dashboard</span>` : ''}
+                        <div class="text-end text-light" style="line-height:1.1;">
+                            <div class="fw-bold" style="font-size:0.75rem;">${currentUser.fullName || currentUser.email}</div>
+                            ${isDev ? `<span class="badge bg-warning text-dark px-1 py-0" style="font-size:0.62rem;">Developer</span>` : ''}
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm py-0 px-2 ms-1" style="font-size:0.75rem;" onclick="handleLogout()" title="Sign Out">
+                            <i class="bi bi-box-arrow-right me-1"></i>Sign Out
+                        </button>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <button class="btn btn-outline-warning btn-sm fw-semibold ms-2" style="font-size:0.75rem;" onclick="openAuthModal('login')">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sign In
+                    </button>
+                `;
+            }
+        }
+
+        function openAuthModal(tab = 'login') {
+            if (tab === 'register') {
+                const regTabBtn = document.getElementById('register-tab');
+                if (regTabBtn) new bootstrap.Tab(regTabBtn).show();
+            } else {
+                const loginTabBtn = document.getElementById('login-tab');
+                if (loginTabBtn) new bootstrap.Tab(loginTabBtn).show();
+            }
+            authModal.show();
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (!res.ok) {
+                    alert('Invalid email or password.');
+                    return;
+                }
+
+                const data = await res.json();
+                localStorage.setItem('coreticket_token', data.token);
+                localStorage.setItem('coreticket_user', JSON.stringify(data));
+                currentUser = data;
+
+                authModal.hide();
+                applyAuthViewState();
+                showNotificationToast(`Welcome back, ${data.fullName || data.email}!`);
+            } catch (err) {
+                console.error(err);
+                alert('Authentication error. Please try again.');
+            }
+        }
+
+        async function handleRegister() {
+            const fullName = document.getElementById('regFullName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const role = parseInt(document.getElementById('regRole').value);
+
+            try {
+                const res = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, email, password, role })
+                });
+
+                if (!res.ok) {
+                    alert('Failed to register account. Email may already exist.');
+                    return;
+                }
+
+                const data = await res.json();
+                localStorage.setItem('coreticket_token', data.token);
+                localStorage.setItem('coreticket_user', JSON.stringify(data));
+                currentUser = data;
+
+                authModal.hide();
+                applyAuthViewState();
+                showNotificationToast(`Account registered! Welcome to CoreTicket, ${data.fullName}!`);
+            } catch (err) {
+                console.error(err);
+                alert('Registration error. Please try again.');
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('coreticket_token');
+            localStorage.removeItem('coreticket_user');
+            currentUser = null;
+            applyAuthViewState();
+            showNotificationToast('Logged out successfully.');
+        }
+
+        function switchRole(role) {
+            activeRole = role;
+            document.getElementById('btnCustomerRole').classList.toggle('active', role === 'customer');
+            document.getElementById('btnDevRole').classList.toggle('active', role === 'developer');
+
+            document.getElementById('customerView').style.display = role === 'customer' ? 'block' : 'none';
+            document.getElementById('developerView').style.display = role === 'developer' ? 'block' : 'none';
+        }
+
+        async function loadDashboard() {
+            try {
+                const metricsRes = await fetch(`${API_URL}/dashboard/metrics`);
+                const metrics = await metricsRes.json();
+
+                document.getElementById('metricTotal').innerText = metrics.totalTickets;
+                document.getElementById('metricOpen').innerText = metrics.openTicketsCount + metrics.inProgressTicketsCount;
+                document.getElementById('metricBreached').innerText = metrics.slaBreachedCount;
+                document.getElementById('metricAvgTime').innerText = `${metrics.averageResolutionTimeHours}h`;
+
+                const ticketsRes = await fetch(`${API_URL}/tickets`);
+                const freshTickets = await ticketsRes.json();
+
+                checkStatusNotifications(freshTickets);
+
+                rawTicketsList = freshTickets;
+                applyFilterAndRender();
+                renderCustomerSubmissions(freshTickets);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function checkStatusNotifications(freshTickets) {
+            freshTickets.forEach(t => {
+                const oldStatus = previousStatuses[t.id];
+                if (oldStatus && oldStatus !== t.status) {
+                    if (t.status === 4 || t.status === 5) {
+                        const noteHtml = t.latestNote ? `<br><small class="text-dark"><strong>Developer Note:</strong> ${t.latestNote}</small>` : '';
+                        showNotificationToast(`🎉 Ticket <strong>${t.ticketNumber}</strong> has been resolved by the developer team!${noteHtml}`);
+                    }
+                }
+                previousStatuses[t.id] = t.status;
+            });
+        }
+
+        function showNotificationToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification alert alert-success alert-dismissible fade show border-0 shadow';
+            toast.style.background = '#dcfce7';
+            toast.style.color = '#15803d';
+            toast.innerHTML = `
+                <i class="bi bi-check-circle-fill me-2 fs-6"></i> ${msg}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 6000);
+        }
+
+        async function submitCustomerTicket() {
+            const category = document.getElementById('custCategory').value;
+            const rawTitle = document.getElementById('custTitle').value.trim();
+            const description = document.getElementById('custDescription').value.trim();
+
+            if (!rawTitle || !description) {
+                alert('Please fill in both title and description before submitting.');
+                return;
+            }
+
+            const priority = category === 'Bug' ? 3 : (category === 'Idea' ? 2 : 1);
+            const title = `[${category}] ${rawTitle}`;
+
+            try {
+                const res = await fetch(`${API_URL}/tickets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, priority })
+                });
+
+                if (res.ok) {
+                    document.getElementById('customerTicketForm').reset();
+                    showNotificationToast('✅ Your ticket has been submitted to the developer queue!');
+                    loadDashboard();
+                } else {
+                    alert('Failed to submit ticket.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error submitting ticket.');
+            }
+        }
+
+        function renderCustomerSubmissions(tickets) {
+            const container = document.getElementById('customerTicketsList');
+            if (!tickets.length) {
+                container.innerHTML = `<div class="text-center py-4 text-muted">No tickets submitted yet.</div>`;
+                return;
+            }
+
+            const statusNames = { 1: 'Open', 2: 'In Progress', 3: 'Pending User', 4: 'Resolved', 5: 'Closed' };
+            const statusBadges = { 1: 'bg-secondary', 2: 'bg-warning text-dark', 4: 'bg-success', 5: 'bg-dark' };
+
+            container.innerHTML = tickets.map(t => `
+                <div class="border-bottom py-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <span class="fw-bold font-monospace text-warning">${t.ticketNumber}</span>
+                        <span class="badge ${statusBadges[t.status]} px-2 py-1">${statusNames[t.status]}</span>
+                    </div>
+                    <div class="fw-semibold text-dark small">${t.title}</div>
+                    <div class="small text-muted text-truncate mb-1">${t.description}</div>
+                    ${t.latestNote ? `<div class="p-2 rounded border-start border-3 border-warning small text-dark mt-1" style="background:#fffbeb; font-size:0.75rem;"><i class="bi bi-chat-left-text-fill text-warning me-1"></i><strong>Dev Note:</strong> ${t.latestNote}</div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function filterQueue(type, btn) {
+            currentFilter = type;
+            document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            applyFilterAndRender();
+        }
+
+        function searchTickets() { applyFilterAndRender(); }
+
+        function applyFilterAndRender() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = rawTicketsList;
+
+            if (currentFilter === 'open') {
+                filtered = filtered.filter(t => t.status === 1 || t.status === 2);
+            } else if (currentFilter === 'breached') {
+                filtered = filtered.filter(t => t.isSlaBreached);
+            }
+
+            if (searchTerm) {
+                filtered = filtered.filter(t => 
+                    t.ticketNumber.toLowerCase().includes(searchTerm) || 
+                    t.title.toLowerCase().includes(searchTerm) || 
+                    t.description.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderTickets(filtered);
+        }
+
+        function renderTickets(tickets) {
+            const tbody = document.getElementById('ticketTableBody');
+            if (!tickets.length) {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No tickets found matching criteria.</td></tr>`;
+                return;
+            }
+
+            const priorityNames = { 1: 'Low', 2: 'Medium', 3: 'High', 4: 'Urgent' };
+            const statusNames = { 1: 'Open', 2: 'In Progress', 3: 'Pending User', 4: 'Resolved', 5: 'Closed' };
+
+            tbody.innerHTML = tickets.map(t => `
+                <tr>
+                    <td><span class="fw-bold text-dark font-monospace">${t.ticketNumber}</span></td>
+                    <td>
+                        <div class="fw-semibold text-dark" style="font-size:0.85rem;">${t.title}</div>
+                        <div class="text-muted text-truncate" style="max-width:280px; font-size:0.75rem;">${t.description}</div>
+                    </td>
+                    <td><span class="badge badge-priority-${t.priority} px-2 py-1 rounded-pill">${priorityNames[t.priority]}</span></td>
+                    <td><span class="badge badge-status-${t.status} px-2 py-1 rounded-pill">${statusNames[t.status]}</span></td>
+                    <td><span class="fw-medium text-slate-600" style="font-size:0.75rem;">${new Date(t.targetResolutionTime).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'})}</span></td>
+                    <td>
+                        ${t.isSlaBreached 
+                            ? `<span class="badge bg-danger text-white rounded-pill px-2 py-1" style="font-size:0.7rem;"><i class="bi bi-exclamation-triangle-fill me-1"></i>Breached</span>`
+                            : `<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1" style="font-size:0.7rem;"><i class="bi bi-check-circle-fill me-1"></i>On Track</span>`}
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-warning btn-sm text-dark fw-bold rounded py-0 px-2" onclick="openStatusModal('${t.id}', ${t.status})" title="Update Status">
+                            <i class="bi bi-pencil-square me-1"></i>Resolve
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openStatusModal(ticketId, currentStatus) {
+            document.getElementById('statusTicketId').value = ticketId;
+            document.getElementById('newStatusSelect').value = currentStatus;
+            document.getElementById('statusNote').value = '';
+            statusModal.show();
+        }
+
+        async function saveStatusChange() {
+            const ticketId = document.getElementById('statusTicketId').value;
+            const newStatus = parseInt(document.getElementById('newStatusSelect').value);
+            const note = document.getElementById('statusNote').value || 'Status updated by developer';
+
+            await fetch(`${API_URL}/tickets/${ticketId}/status`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ newStatus, note })
+            });
+
+            statusModal.hide();
+            loadDashboard();
+        }
+    </script>
+</body>
+</html>

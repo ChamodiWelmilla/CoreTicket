@@ -22,6 +22,7 @@ public class TicketService
 
     public async Task<TicketDto> CreateTicketAsync(CreateTicketRequest request, Guid userId)
     {
+        var user = await EnsureUserExistsAsync(userId);
         var ticketNumber = $"TICK-{Random.Shared.Next(100000, 999999)}";
         var createdAt = _dateTime.UtcNow;
         var targetResolution = _slaCalculator.CalculateTargetResolutionTime(request.Priority, createdAt);
@@ -33,7 +34,7 @@ public class TicketService
             Description = request.Description,
             Priority = request.Priority,
             Status = TicketStatus.Open,
-            CreatedByUserId = userId,
+            CreatedByUserId = user.Id,
             CreatedAt = createdAt,
             TargetResolutionTime = targetResolution
         };
@@ -41,8 +42,7 @@ public class TicketService
         _context.Tickets.Add(ticket);
         await _context.SaveChangesAsync();
 
-        var user = await _context.Users.FindAsync(userId);
-        return MapToDto(ticket, user?.Email, null);
+        return MapToDto(ticket, user.Email, null);
     }
 
     public async Task<List<TicketDto>> GetTicketsAsync(TicketStatus? status = null, TicketPriority? priority = null)
@@ -67,16 +67,18 @@ public class TicketService
             t.TargetResolutionTime,
             t.CreatedAt,
             t.CreatedByUser.Email,
-            t.AssignedAgent != null ? t.AssignedAgent.Email : null
+            t.AssignedAgent != null ? t.AssignedAgent.Email : null,
+            t.HistoryLogs.OrderByDescending(h => h.Timestamp).Select(h => h.Note).FirstOrDefault()
         )).ToListAsync();
     }
 
     public async Task UpdateStatusAsync(Guid ticketId, UpdateTicketStatusRequest request, Guid userId)
     {
-        var ticket = await _context.Tickets.Include(t => t.HistoryLogs).FirstOrDefaultAsync(t => t.Id == ticketId)
+        var user = await EnsureUserExistsAsync(userId);
+        var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId)
             ?? throw new DomainException("Ticket not found.");
 
-        ticket.TransitionTo(request.NewStatus, userId, request.Note);
+        ticket.TransitionTo(request.NewStatus, user.Id, request.Note);
         await _context.SaveChangesAsync();
     }
 
@@ -94,13 +96,14 @@ public class TicketService
 
     public async Task AddCommentAsync(Guid ticketId, AddCommentRequest request, Guid userId)
     {
+        var user = await EnsureUserExistsAsync(userId);
         var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId)
             ?? throw new DomainException("Ticket not found.");
 
         var comment = new TicketComment
         {
             TicketId = ticket.Id,
-            UserId = userId,
+            UserId = user.Id,
             Message = request.Message,
             IsInternalNote = request.IsInternalNote,
             CreatedAt = _dateTime.UtcNow
@@ -110,6 +113,27 @@ public class TicketService
         await _context.SaveChangesAsync();
     }
 
+    private async Task<User> EnsureUserExistsAsync(Guid userId)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user != null) return user;
+
+        user = await _context.Users.FirstOrDefaultAsync(u => u.Email == "system@coreticket.com");
+        if (user != null) return user;
+
+        user = new User
+        {
+            FullName = "System Demo User",
+            Email = "system@coreticket.com",
+            PasswordHash = "system_hash",
+            Role = UserRole.Customer
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+        return user;
+    }
+
     private static TicketDto MapToDto(Ticket t, string? creatorEmail, string? agentEmail)
-        => new(t.Id, t.TicketNumber, t.Title, t.Description, t.Priority, t.Status, t.IsSlaBreached, t.TargetResolutionTime, t.CreatedAt, creatorEmail ?? "", agentEmail);
+        => new(t.Id, t.TicketNumber, t.Title, t.Description, t.Priority, t.Status, t.IsSlaBreached, t.TargetResolutionTime, t.CreatedAt, creatorEmail ?? "", agentEmail, null);
 }

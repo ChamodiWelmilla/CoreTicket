@@ -7,6 +7,7 @@ public interface IApplicationDbContext
 {
     DbSet<User> Users { get; }
     DbSet<Ticket> Tickets { get; }
+    DbSet<TicketComment> TicketComments { get; }
     DbSet<TicketHistory> TicketHistories { get; }
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

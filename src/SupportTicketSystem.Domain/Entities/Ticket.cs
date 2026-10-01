@@ -11,7 +11,7 @@ public class Ticket
     public string Description { get; set; } = string.Empty;
     public TicketPriority Priority { get; set; }
     public TicketStatus Status { get; set; } = TicketStatus.Open;
-    public bool IsSlaBreached { get; set; } = false;
+    public bool IsSlaBreached { get; set; }
 
     public DateTime TargetResolutionTime { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -23,6 +23,7 @@ public class Ticket
     public Guid? AssignedAgentId { get; set; }
     public User? AssignedAgent { get; set; }
 
+    public ICollection<TicketComment> Comments { get; set; } = new List<TicketComment>();
     public ICollection<TicketHistory> HistoryLogs { get; set; } = new List<TicketHistory>();
 
     public void TransitionTo(TicketStatus newStatus, Guid changedByUserId, string note)

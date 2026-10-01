@@ -10,6 +10,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<Ticket> Tickets => Set<Ticket>();
+    public DbSet<TicketComment> TicketComments => Set<TicketComment>();
     public DbSet<TicketHistory> TicketHistories => Set<TicketHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

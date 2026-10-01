@@ -80,6 +80,36 @@ public class TicketService
         await _context.SaveChangesAsync();
     }
 
+    public async Task AssignAgentAsync(Guid ticketId, Guid agentId)
+    {
+        var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId)
+            ?? throw new DomainException("Ticket not found.");
+
+        var agent = await _context.Users.FirstOrDefaultAsync(u => u.Id == agentId && u.Role == UserRole.Agent)
+            ?? throw new DomainException("Agent not found or specified user is not an agent.");
+
+        ticket.AssignedAgentId = agent.Id;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task AddCommentAsync(Guid ticketId, AddCommentRequest request, Guid userId)
+    {
+        var ticket = await _context.Tickets.FirstOrDefaultAsync(t => t.Id == ticketId)
+            ?? throw new DomainException("Ticket not found.");
+
+        var comment = new TicketComment
+        {
+            TicketId = ticket.Id,
+            UserId = userId,
+            Message = request.Message,
+            IsInternalNote = request.IsInternalNote,
+            CreatedAt = _dateTime.UtcNow
+        };
+
+        _context.TicketComments.Add(comment);
+        await _context.SaveChangesAsync();
+    }
+
     private static TicketDto MapToDto(Ticket t, string? creatorEmail, string? agentEmail)
         => new(t.Id, t.TicketNumber, t.Title, t.Description, t.Priority, t.Status, t.IsSlaBreached, t.TargetResolutionTime, t.CreatedAt, creatorEmail ?? "", agentEmail);
 }
